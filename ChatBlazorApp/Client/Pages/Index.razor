@@ -1,7 +1,59 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@code {
+	protected override void OnInitialized()
+	{
+		appState.UserName = AppState.UserName;
 
-Welcome to your new app.
+		foreach (var pair in AppState.Rooms)
+		{
+			appState.Rooms.Add(pair.Key, pair.Value);
+		}
+	}
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+	private void FormSubmit()
+	{
+		AppState.UserName = appState.UserName;
+		AppState.Rooms = new Dictionary<string, int>();
+
+		string[] splitArray = appState.RoomsCommaSeperated.Split(',');
+
+		foreach (string s in splitArray)
+		{
+			AppState.Rooms.Add(s, 0);
+		}
+
+		Console.WriteLine("Joining rooms... " + string.Join(',', AppState.Rooms));
+
+		AppState.RoomsCommaSeperated = appState.RoomsCommaSeperated;
+
+		formText = "Form submitted successfully!";
+
+		AppState.AppStateUpdated?.Invoke();
+	}
+
+	AppState appState = new AppState();
+	string formText = "";
+
+}
+
+<center>
+	
+	<h1>Chat Blazor</h1>
+
+	This is the chat app designed for the Allegiance Technical interview.
+
+</center>
+
+<br>
+
+<EditForm Model="@appState" OnSubmit="FormSubmit" >
+	<label>User Name:</label>
+	<InputText @bind-Value="@appState.UserName" />
+	<br />
+	<label>Rooms:</label>
+	<InputText @bind-Value="@appState.RoomsCommaSeperated" />
+	<br />
+	<button type="submit">Submit Form</button>
+	<p>@formText</p>
+</EditForm>
