@@ -63,7 +63,14 @@ namespace ChatBlazorApp.Server
 
 			app.UseRouting();
 
+			app.UseEndpoints(endpoints =>
+			{
 
+				endpoints.MapRazorPages();
+				endpoints.MapControllers();
+				endpoints.MapHub<ChatHub>("/chathub");
+				endpoints.MapFallbackToFile("index.html");
+			});
 		}
 	}
 }
