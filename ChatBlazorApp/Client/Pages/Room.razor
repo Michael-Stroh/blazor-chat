@@ -24,6 +24,7 @@
 <ul id="messagesList">
 	@foreach (var message in messages)
 	{
+
 		<li>@message</li>
 	}
 </ul>
@@ -37,6 +38,7 @@
 
 	protected override async Task OnParametersSetAsync()
 	{
+
 		messages.Clear();
 		userInput = "";
 		messageInput = "";
@@ -47,6 +49,7 @@
 
 		hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
 		{
+
 			var encodedMsg = $"{user}: {message}";
 			messages.Add(encodedMsg);
 			StateHasChanged();
@@ -60,8 +63,10 @@
 
 		if (previousChats != null)
 		{
+
 			foreach (var previousChat in previousChats)
 			{
+
 				var encodedMsg = $"{previousChat.User}: {previousChat.Message}";
 				messages.Add(encodedMsg);
 			}
@@ -76,6 +81,7 @@
 
 	public void Dispose()
 	{
+
 		_ = hubConnection.DisposeAsync();
 	}
 }
