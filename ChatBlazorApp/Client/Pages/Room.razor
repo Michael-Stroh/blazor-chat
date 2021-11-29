@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 
+<!--
 <p>@AppState.UserName</p>
 
 <div class="form-group">
@@ -12,6 +13,7 @@
 	</label>
 </div>
 <button @onclick="Send" disabled="@(HubConnection.State != HubConnectionState.Connected)">Send</button>
+-->
 
 <hr>
 
@@ -22,7 +24,14 @@
 	}
 </ul>
 
+<div id="footer">
+    <input class="middle" placeholder="Enter a message" @bind="messageInput" @bind:event="oninput" hidden="@(HubConnection.State != HubConnectionState.Connected)"/>
+    <button @onclick="Send" disabled="@(HubConnection.State != HubConnectionState.Connected)">Send</button>
+	<button @onclick="ClearMessageInput" hidden="@EmptyMessageInput" >X</button>
+</div>
+
 @code {
+
 	string previousRoomName = "";
 	[Parameter] public string RoomName { get; set; }
 	[CascadingParameter] public Microsoft.AspNetCore.SignalR.Client.HubConnection HubConnection { get; set; }
@@ -66,7 +75,19 @@
 		StateHasChanged();
 	}
 
-	Task Send() =>
-		HubConnection.SendAsync("SendMessage", AppState.UserName, messageInput, RoomName);
+	private async Task Send()
+	{
+		await HubConnection.SendAsync("SendMessage", AppState.UserName, messageInput, RoomName);
+		ClearMessageInput();
+	}
 
+
+	// Clear any text typed in by the user
+	private void ClearMessageInput()
+    {
+        this.messageInput = "";
+    }
+
+	// Hide the clear button if there is no text
+	private bool EmptyMessageInput => this.messageInput != "";
 }
