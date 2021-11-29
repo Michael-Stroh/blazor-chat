@@ -1,32 +1,19 @@
 ﻿@page "/{RoomName}"
+@using ChatApplication.Shared
 @using ChatBlazorApp.Shared
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 
-<!--
-<p>@AppState.UserName</p>
-
-<div class="form-group">
-	<label>
-		Message:
-		<input @bind="messageInput" size="50" />
-	</label>
-</div>
-<button @onclick="Send" disabled="@(HubConnection.State != HubConnectionState.Connected)">Send</button>
--->
-
-<hr>
-
 <ul id="messagesList">
 	@foreach (var message in messages)
 	{
-		<li>@message</li>
+		<li>@message.MessageText</li>
 	}
 </ul>
 
 <div id="footer">
     <input class="middle" placeholder="Enter a message" @bind="messageInput" @bind:event="oninput" hidden="@(HubConnection.State != HubConnectionState.Connected)"/>
-    <button @onclick="Send" disabled="@(HubConnection.State != HubConnectionState.Connected)">Send</button>
+    <button @onclick="Send" disabled="@IsConnected()">Send</button>
 	<button @onclick="ClearMessageInput" hidden="@EmptyMessageInput" >X</button>
 </div>
 
@@ -36,7 +23,7 @@
 	[Parameter] public string RoomName { get; set; }
 	[CascadingParameter] public Microsoft.AspNetCore.SignalR.Client.HubConnection HubConnection { get; set; }
 
-	private List<string> messages = new List<string>();
+	private List<Message> messages = new List<Message>();
 	private string userInput;
 	private string messageInput;
 
@@ -63,15 +50,19 @@
 		{
 			foreach (var previousChat in previousChats)
 			{
+				// Get the data to create a new message
 				var encodedMsg = $"{previousChat.User}: {previousChat.Message}";
-				messages.Add(encodedMsg);
+				var AddMessage = new Message( false, AppState.UserName, encodedMsg );
+
+				// Add to list of messages
+				messages.Add( AddMessage );
 			}
 		}
 	}
 
-	public void ReceiveMessage(string message)
+	public void ReceiveMessage(Message message)
 	{
-		messages.Add(message);
+		messages.Add( message );
 		StateHasChanged();
 	}
 
@@ -84,10 +75,22 @@
 
 	// Clear any text typed in by the user
 	private void ClearMessageInput()
-    {
-        this.messageInput = "";
-    }
+	{
+		this.messageInput = "";
+	}
 
 	// Hide the clear button if there is no text
-	private bool EmptyMessageInput => this.messageInput != "";
+	private bool EmptyMessageInput => this.messageInput == "";
+
+	private bool IsConnected()
+	{
+		if ( this.messageInput == "" ) {
+
+			return HubConnection.State == HubConnectionState.Connected; 
+		}
+
+		return this.messageInput == "";
+	}
+
+
 }
