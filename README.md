@@ -24,28 +24,28 @@ First thing would be to create the generic Blazor WASM files, this can be create
 
 <div>
 Firstly select create a new project </br> 
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/create.png">
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/create.png">
 </div>
 
 </br>
 
 <div>
 Select the Blazor WASM project </br>
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/blazor_select.png">
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/blazor_select.png">
 </div>
 
 </br>
 
 <div>
-Type in the name of tha application </br>
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/configure.png">
+Type in the name of the application </br>
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/configure.png">
 </div>
 
 </br>
 
 <div>
 Add the additional information as such (pay attention to selected boxes) </br>
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/additional.png">    
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Install/additional.png">    
 </div>
 
 # Command Line
@@ -63,14 +63,14 @@ Add the additional information as such (pay attention to selected boxes) </br>
 
 <div>
 Select the debug toolbar option </br>
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Run/toolbar.png">
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Run/toolbar.png">
 </div>
 
 </br>
 
 <div>
 Select start without debugging </br>
-<img align="center" width="200" height="200" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Run/select.png">
+<img align="center" width="800" height="500" src="https://github.com/Michael-Stroh/blazor-chat/blob/59f0fe8e711e0d7884466bbd07447b5a3e7ded35/Images/Run/select.png">
 </div>
 
 The web app will start in your default browser.
