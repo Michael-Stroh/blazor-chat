@@ -1,15 +1,87 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@using ChatApplication.Shared
+@using ChatBlazorApp.Shared
 
 <div class="sidebar">
-    <NavMenu />
+	<NavMenu />
 </div>
 
 <div class="main">
-    <div class="top-row px-4">
-        <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
-    </div>
+	<div class="top-row px-4">
+		<a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+	</div>
 
-    <div class="content px-4">
-        @Body
-    </div>
+	<div class="content px-4">
+		<CascadingValue Value="hubConnection">
+			@Body
+		</CascadingValue>
+	</div>
 </div>
+
+@code {
+	private HubConnection hubConnection;
+	private List<string> roomsJoined = new List<string>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		AppState.AppStateUpdated += async () =>
+		{
+			// The ToList() is important as without it the lambda is called each time the var is accessed
+			var newRooms = AppState.Rooms.Where(n => !roomsJoined.Contains(n.Key)).Select(n => n.Key).ToList();
+
+			// If the room does not exist create it
+			roomsJoined.AddRange(newRooms);
+
+			// Go through each room and join the user to it
+			foreach (var room in newRooms)
+			{
+				await hubConnection.SendAsync("JoinRoom", room);
+			}
+
+			// Console.WriteLine("roomsJoined" + AppState.Name + "" + roomsJoined  );
+		};
+
+		hubConnection = new HubConnectionBuilder()
+			.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
+			.Build();
+
+		hubConnection.On<string, String, string>("ReceiveMessage", (user, message, roomName) =>
+		{
+			if (AppState.CurrentRoom?.RoomName == roomName)
+			{
+			
+				// Get the data to create a new message
+				var encodedMsg = $"{user}: {message}";
+				// var encodedMsg = $"{message.MessageText}";
+
+				AppState.CurrentRoom.ReceiveMessage( encodedMsg );
+			}
+			else
+			{
+				// Notification by that room.
+				if (AppState.Rooms.ContainsKey(roomName))
+				{
+
+					// Console.WriteLine("Notification Increasing");
+					AppState.Rooms[roomName] = AppState.Rooms[roomName] + 1;
+					AppState.AppStateUpdated?.Invoke();
+				}
+			}
+		});
+
+		await hubConnection.StartAsync();
+	}
+
+	public bool IsConnected =>
+		hubConnection.State == HubConnectionState.Connected;
+
+	public void Dispose()
+	{
+		_ = hubConnection.DisposeAsync();
+	}
+
+
+}

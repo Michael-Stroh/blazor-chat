@@ -1,7 +1,15 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
 
-<h1>Hello, world!</h1>
+<h1>Redirect Page</h1>
 
-Welcome to your new app.
+<p>Redirecting to Default Page</p>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+
+    // Redirect to the register page 
+    protected override void OnInitialized()
+    {
+        NavManager.NavigateTo("/register");
+    }
+}

@@ -1,0 +1,71 @@
+﻿@page "/register"
+
+@code {
+	protected override void OnInitialized()
+	{
+		appState.UserName = AppState.UserName;
+
+		foreach (var pair in AppState.Rooms)
+		{
+			appState.Rooms.Add(pair.Key, pair.Value);
+		}
+	}
+
+	private void FormSubmit()
+	{
+		AppState.UserName = appState.UserName;
+		AppState.Rooms = new Dictionary<string, int>();
+
+		/* Check if any rooms were selected 
+		 * if no rooms create generic room chat
+		 */
+		if (appState.RoomsCommaSeperated == null || appState.RoomsCommaSeperated == "")
+		{
+			appState.RoomsCommaSeperated = "chat";
+		} 
+		
+		// Get the separate rooms to join
+		string[] splitArray = appState.RoomsCommaSeperated.Split(',');
+
+		foreach (string s in splitArray)
+		{
+			AppState.Rooms.Add(s, 0);
+		}
+
+		AppState.RoomsCommaSeperated = appState.RoomsCommaSeperated;
+
+		formText = "Form submitted successfully!";
+
+		AppState.AppStateUpdated?.Invoke();
+	}
+
+	AppState appState = new AppState();
+	string formText = "";
+}
+
+<center>
+	
+	<h1>Chat Blazor</h1>
+
+	This is the chat app designed for the Allegiance Technical interview.
+
+</center>
+
+<br />
+
+<EditForm Model="@appState" OnSubmit="FormSubmit" >
+	<label>User Name:</label>
+	<InputText @bind-Value="@appState.Name" />
+	<br />
+		<label>Surname:</label>
+	<InputText @bind-Value="@appState.Surname" />
+	<br />
+		<label>Username:</label>
+	<InputText @bind-Value="@appState.UserName" />
+	<br />
+	<label>Rooms:</label>
+	<InputText @bind-Value="@appState.RoomsCommaSeperated" />
+	<br />
+	<button type="submit">Start Chat</button>
+	<p>@formText</p>
+</EditForm>

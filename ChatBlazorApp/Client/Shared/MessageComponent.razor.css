@@ -1,0 +1,24 @@
+#messageBlock {
+
+	border-radius: 8px;
+	margin-bottom: 8px;
+	display: flex;
+	padding: 5px;
+	flex-direction: column-reverse;
+}
+
+#messageFooter {
+
+	text-align: right;
+}
+
+.user {
+	color: black;
+	color: lightgreen;
+}
+
+.system {
+	
+	color: white;
+	background-color: grey;
+}

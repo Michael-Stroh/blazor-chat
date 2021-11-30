@@ -1,87 +1,123 @@
 ﻿@page "/{RoomName}"
-@using Microsoft.AspNetCore.SignalR.Client
+@using ChatApplication.Shared
 @using ChatBlazorApp.Shared
-@inject NavigationManager NavigationManager
-@implements IDisposable
+@using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 
-<div class="form-group">
-	<label>
-		User:
-		<input @bind="userInput" />
-	</label>
-</div>
-<div class="form-group">
-	<label>
-		Message:
-		<input @bind="messageInput" size="50" />
-	</label>
-</div>
-<button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<!--
+<div id="messagesScroll">
+	<div id="messagesList">
+		@foreach (var message in messages)
+		{
+			// Determine which side the message should display
+			var sortSide = (message.User == @AppState.UserName) ? "right" : "left";
 
-<hr>
+			// Display the message and on the correct side
+			<div class="message @sortSide">
+
+				<MessageComponent MsgData="@message"></MessageComponent>
+			</div>
+
+		}
+	</div>
+</div> -->
+
 
 <ul id="messagesList">
-	@foreach (var message in messages)
+	@foreach ( var message in messages )
 	{
-
-		<li>@message</li>
+		<li> @message </li>
 	}
 </ul>
 
+
+<div id="footer">
+
+    <input class="middle" placeholder="Enter a message" @bind="messageInput" @bind:event="oninput" hidden="@(HubConnection.State != HubConnectionState.Connected)"/>
+    <button @onclick="Send" disabled="@IsConnected()">Send</button>
+	<button @onclick="ClearMessageInput" hidden="@EmptyMessageInput" >X</button>
+</div>
+
 @code {
+
+	string previousRoomName = "";
+
 	[Parameter] public string RoomName { get; set; }
-	private HubConnection hubConnection;
-	private List<string> messages = new List<string>();
+	[CascadingParameter] public Microsoft.AspNetCore.SignalR.Client.HubConnection HubConnection { get; set; }
+
+	//private List<Message> messages = new List<Message>();
+	private List<String> messages = new List<String>();
 	private string userInput;
 	private string messageInput;
 
 	protected override async Task OnParametersSetAsync()
 	{
-
+		if (RoomName == previousRoomName)
+			return;
+		previousRoomName = RoomName;
 		messages.Clear();
 		userInput = "";
 		messageInput = "";
 
-		hubConnection = new HubConnectionBuilder()
-			.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-			.Build();
-
-		hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
+		if (AppState.Rooms.ContainsKey(RoomName))
 		{
+			AppState.Rooms[RoomName] = 0;
+			AppState.AppStateUpdated?.Invoke();
+		}
 
-			var encodedMsg = $"{user}: {message}";
-			messages.Add(encodedMsg);
-			StateHasChanged();
-		});
-
-		await hubConnection.StartAsync();
-
-		await hubConnection.SendAsync("JoinRoom", RoomName);
+		AppState.CurrentRoom = this;
 
 		var previousChats = await Http.GetFromJsonAsync<ChatData[]>($"Chat/{RoomName}");
 
 		if (previousChats != null)
 		{
-
 			foreach (var previousChat in previousChats)
 			{
-
+				// Get the data to create a new message
 				var encodedMsg = $"{previousChat.User}: {previousChat.Message}";
-				messages.Add(encodedMsg);
+
+				// var encodedMsg = $"{previousChat.Message.MessageText}";
+				// var AddMessage = new Message( false, AppState.UserName, encodedMsg );
+
+				// Add to list of messages
+				messages.Add( encodedMsg );
 			}
 		}
 	}
 
-	Task Send() =>
-		hubConnection.SendAsync("SendMessage", userInput, messageInput, RoomName);
-
-	public bool IsConnected =>
-		hubConnection.State == HubConnectionState.Connected;
-
-	public void Dispose()
+	public void ReceiveMessage(String message)
 	{
-
-		_ = hubConnection.DisposeAsync();
+		messages.Add( message );
+		StateHasChanged();
 	}
+
+	private async Task Send()
+	{
+		// var AddMessage = new Message( false, AppState.UserName, messageInput );
+
+		await HubConnection.SendAsync("SendMessage", AppState.UserName, messageInput, RoomName);
+		ClearMessageInput();
+	}
+
+
+	// Clear any text typed in by the user
+	private void ClearMessageInput()
+	{
+		this.messageInput = "";
+	}
+
+	// Hide the clear button if there is no text
+	private bool EmptyMessageInput => this.messageInput == "";
+
+	private bool IsConnected()
+	{
+		if ( this.messageInput == "" ) {
+
+			return HubConnection.State == HubConnectionState.Connected; 
+		}
+
+		return this.messageInput == "";
+	}
+
+
 }

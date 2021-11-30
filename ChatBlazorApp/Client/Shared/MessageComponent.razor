@@ -1,0 +1,30 @@
+@using ChatApplication.Shared﻿
+
+<!-- Check if there is actually data to display --> 
+@if ( MsgData != null )
+{
+	<div id="messageBlock" class="@User" style="@BackgroundColor">
+
+		<div id="messageFooter">
+			@Name    @MsgData.Timestamp;
+		</div>
+		<div id="messageContent">
+			
+			@MsgData.MessageText
+		</div>
+	</div>
+}
+
+@code {
+	
+	// Recieve as a parameter when the component is called
+    [Parameter] public Message MsgData { get; set; }
+	
+	// Get all the relevant data about the user to be displayed in the text bubble
+
+	private string User => ( this.MsgData?.User != null ) ? "user" : "system";
+	
+	private string BackgroundColor => (this.MsgData?.User != null) ? "background-color: rgb" + this.MsgData.Color.ToString() : "";
+	
+	private string Name => this.MsgData?.User ?? "";
+}
