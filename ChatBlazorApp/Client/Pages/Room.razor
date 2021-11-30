@@ -4,14 +4,35 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject HttpClient Http
 
+<!--
+<div id="messagesScroll">
+	<div id="messagesList">
+		@foreach (var message in messages)
+		{
+			// Determine which side the message should display
+			var sortSide = (message.User == @AppState.UserName) ? "right" : "left";
+
+			// Display the message and on the correct side
+			<div class="message @sortSide">
+
+				<MessageComponent MsgData="@message"></MessageComponent>
+			</div>
+
+		}
+	</div>
+</div> -->
+
+
 <ul id="messagesList">
-	@foreach (var message in messages)
+	@foreach ( var message in messages )
 	{
-		<li>@message.MessageText</li>
+		<li> @message </li>
 	}
 </ul>
 
+
 <div id="footer">
+
     <input class="middle" placeholder="Enter a message" @bind="messageInput" @bind:event="oninput" hidden="@(HubConnection.State != HubConnectionState.Connected)"/>
     <button @onclick="Send" disabled="@IsConnected()">Send</button>
 	<button @onclick="ClearMessageInput" hidden="@EmptyMessageInput" >X</button>
@@ -20,10 +41,12 @@
 @code {
 
 	string previousRoomName = "";
+
 	[Parameter] public string RoomName { get; set; }
 	[CascadingParameter] public Microsoft.AspNetCore.SignalR.Client.HubConnection HubConnection { get; set; }
 
-	private List<Message> messages = new List<Message>();
+	//private List<Message> messages = new List<Message>();
+	private List<String> messages = new List<String>();
 	private string userInput;
 	private string messageInput;
 
@@ -52,15 +75,17 @@
 			{
 				// Get the data to create a new message
 				var encodedMsg = $"{previousChat.User}: {previousChat.Message}";
-				var AddMessage = new Message( false, AppState.UserName, encodedMsg );
+
+				// var encodedMsg = $"{previousChat.Message.MessageText}";
+				// var AddMessage = new Message( false, AppState.UserName, encodedMsg );
 
 				// Add to list of messages
-				messages.Add( AddMessage );
+				messages.Add( encodedMsg );
 			}
 		}
 	}
 
-	public void ReceiveMessage(Message message)
+	public void ReceiveMessage(String message)
 	{
 		messages.Add( message );
 		StateHasChanged();
@@ -68,6 +93,8 @@
 
 	private async Task Send()
 	{
+		// var AddMessage = new Message( false, AppState.UserName, messageInput );
+
 		await HubConnection.SendAsync("SendMessage", AppState.UserName, messageInput, RoomName);
 		ClearMessageInput();
 	}

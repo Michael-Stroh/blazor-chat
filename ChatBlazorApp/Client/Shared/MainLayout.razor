@@ -2,6 +2,8 @@
 @using Microsoft.AspNetCore.SignalR.Client
 @inject NavigationManager NavigationManager
 @implements IDisposable
+@using ChatApplication.Shared
+@using ChatBlazorApp.Shared
 
 <div class="sidebar">
 	<NavMenu />
@@ -27,33 +29,43 @@
 	{
 		AppState.AppStateUpdated += async () =>
 		{
+			// The ToList() is important as without it the lambda is called each time the var is accessed
 			var newRooms = AppState.Rooms.Where(n => !roomsJoined.Contains(n.Key)).Select(n => n.Key).ToList();
 
+			// If the room does not exist create it
 			roomsJoined.AddRange(newRooms);
 
+			// Go through each room and join the user to it
 			foreach (var room in newRooms)
 			{
 				await hubConnection.SendAsync("JoinRoom", room);
 			}
+
+			// Console.WriteLine("roomsJoined" + AppState.Name + "" + roomsJoined  );
 		};
 
 		hubConnection = new HubConnectionBuilder()
 			.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
 			.Build();
 
-		hubConnection.On<string, string, string>("ReceiveMessage", (user, message, roomName) =>
+		hubConnection.On<string, String, string>("ReceiveMessage", (user, message, roomName) =>
 		{
 			if (AppState.CurrentRoom?.RoomName == roomName)
 			{
+			
+				// Get the data to create a new message
 				var encodedMsg = $"{user}: {message}";
-				AppState.CurrentRoom.ReceiveMessage(encodedMsg);
+				// var encodedMsg = $"{message.MessageText}";
+
+				AppState.CurrentRoom.ReceiveMessage( encodedMsg );
 			}
 			else
 			{
 				// Notification by that room.
 				if (AppState.Rooms.ContainsKey(roomName))
 				{
-					Console.WriteLine("Notification Increasing");
+
+					// Console.WriteLine("Notification Increasing");
 					AppState.Rooms[roomName] = AppState.Rooms[roomName] + 1;
 					AppState.AppStateUpdated?.Invoke();
 				}
@@ -61,8 +73,6 @@
 		});
 
 		await hubConnection.StartAsync();
-
-		//
 	}
 
 	public bool IsConnected =>

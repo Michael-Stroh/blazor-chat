@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatApplication.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ namespace ChatBlazorApp.Shared
     public class ChatData
     {
         public string User { get; set; }
-        public string Message { get; set; }
+        // public Message Message { get; set; }
+        public String Message { get; set; }
     }
 }

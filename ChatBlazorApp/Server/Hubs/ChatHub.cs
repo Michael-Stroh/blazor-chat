@@ -1,4 +1,5 @@
-﻿using ChatBlazorApp.Server.Data;
+﻿using ChatApplication.Shared;
+using ChatBlazorApp.Server.Data;
 using ChatBlazorApp.Shared;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -23,7 +24,7 @@ namespace ChatBlazorApp.Server.Hubs
 			await Groups.AddToGroupAsync(Context.ConnectionId, roomName);
 		}
 
-		public async Task SendMessage( string user, string message, string roomName )
+		public async Task SendMessage( string user, String message, string roomName )
 		{
 			ChatData chatData = new Shared.ChatData { User = user, Message = message };
 

@@ -1,59 +1,15 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
+
+<h1>Redirect Page</h1>
+
+<p>Redirecting to Default Page</p>
 
 @code {
-	protected override void OnInitialized()
-	{
-		appState.UserName = AppState.UserName;
 
-		foreach (var pair in AppState.Rooms)
-		{
-			appState.Rooms.Add(pair.Key, pair.Value);
-		}
-	}
-
-	private void FormSubmit()
-	{
-		AppState.UserName = appState.UserName;
-		AppState.Rooms = new Dictionary<string, int>();
-
-		string[] splitArray = appState.RoomsCommaSeperated.Split(',');
-
-		foreach (string s in splitArray)
-		{
-			AppState.Rooms.Add(s, 0);
-		}
-
-		Console.WriteLine("Joining rooms... " + string.Join(',', AppState.Rooms));
-
-		AppState.RoomsCommaSeperated = appState.RoomsCommaSeperated;
-
-		formText = "Form submitted successfully!";
-
-		AppState.AppStateUpdated?.Invoke();
-	}
-
-	AppState appState = new AppState();
-	string formText = "";
-
+    // Redirect to the register page 
+    protected override void OnInitialized()
+    {
+        NavManager.NavigateTo("/register");
+    }
 }
-
-<center>
-	
-	<h1>Chat Blazor</h1>
-
-	This is the chat app designed for the Allegiance Technical interview.
-
-</center>
-
-<br>
-
-<EditForm Model="@appState" OnSubmit="FormSubmit" >
-	<label>User Name:</label>
-	<InputText @bind-Value="@appState.UserName" />
-	<br />
-	<label>Rooms:</label>
-	<InputText @bind-Value="@appState.RoomsCommaSeperated" />
-	<br />
-	<button type="submit">Submit Form</button>
-	<p>@formText</p>
-</EditForm>
